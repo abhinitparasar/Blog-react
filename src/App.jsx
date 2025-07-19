@@ -1,18 +1,36 @@
-import envVariable from "./conf/conf.js"
+import { useState, useEffect } from "react";
+import { Header , Footer } from './components/index.js';
+import { useDispatch, useSelector } from "react-redux";
+import { login , logout } from "./store/authSlice.js";
+import authservice from "./services/Auth.js";
 import './App.css'
 
 function App() {
-  console.log(envVariable.appwriteUrl);
-  console.log(envVariable.appwriteProjectId);
-  console.log(envVariable.appwriteDatabaseId);
-  console.log(envVariable.appwriteCollectionId);
-  console.log(envVariable.appwriteBucketId);
+  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
 
-  return (
+  useEffect(()=> {
+    authservice.getCurrentUser()
+    .then((userData) => {
+      if (userData){
+        dispatch(login(userData));
+      }else{
+        dispatch(logout());
+      }
+    })
+    .finally(() => setLoading(false))
+  },[])
+  
+
+  return !loading? (
     <>
-      <p>hi</p>
+    <div>
+      <Header/>
+        {/*<Outlet/>*/}
+      <Footer/>
+    </div>
     </>
-  )
+  ) : null;
 }
 
 export default App
